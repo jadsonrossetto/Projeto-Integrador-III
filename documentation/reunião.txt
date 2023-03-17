@@ -1,0 +1,23 @@
+	Trabalho integrador 
+	
+		liguagem -> python
+			
+			liquipedia -> 
+				API -> https://liquipedia.net/counterstrike/Help:Mediawiki, 
+				https://liquipedia.net/api-terms-of-use
+				
+				mediawiki liquipedia api documentation
+		
+				requisição -> CS GO 
+		
+			BANCO -> MYSQL
+			
+					PYMYSQL
+					MYSQL CONNERCTOR
+					
+	
+		pergunta qual foi crecimento do jogo ?
+		
+		qual jogar se vai destacar em 2025 ?
+
+		qual mapa tem probalilidade de vitoria do CT ou TR ?
