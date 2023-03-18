@@ -1,3 +1,0 @@
-# Documentation 
-
-    https://12factor.net/
