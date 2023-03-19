@@ -18,7 +18,21 @@ class Protect:
         
     def folder_api(self):
         
-        self.config_ = os.path.expanduser('~\\OneDrive\\Faculdade\\Projeto Integrador III\\app\\folder_api')
+        self.config_ = os.path.expanduser('~\\OneDrive\\Faculdade\\Projeto Integrador III\\app\\view\\static_request_api')
         
         if self.config_ != '':
             return self.config_
+        
+    def query_sql(self, file_query):
+        '''
+        Função que busca a query no arquivo informado.
+        @self.config_ : local aonda se enconrar os aquivos slq
+        return query -> que tem nesse aquivo.
+        '''
+        self.config_ = os.path.expanduser('~\\Daniel\\OneDrive\\Faculdade\\Projeto Integrador III\\sql')
+        
+        with open(self.config_+file_query+'.sql') as query_read:
+            query = query_read.read()
+            
+            if query != None:
+                return query

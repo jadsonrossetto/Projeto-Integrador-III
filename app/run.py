@@ -8,12 +8,15 @@ api.query_public(730,1,'json')
 data = api.api_get()
 print(data.)
 '''
-from controller.get_api_player import LiquiApi
+#from controller.get_api_player import LiquiApi
+#api = LiquiApi('Analyst', 'counterstrike','Main_Page')
+#list_api = api.get_cs_players()
 
 
-api = LiquiApi('Analyst', 'counterstrike')
+query = f" SELCT *                       "; 
+f"FROM LOGRESTAPI                        ";
+f"WHERE  BaseUrl = '{'teste'}'    ";
+f"       AND = '{'TESTE'}'             ";
+f"       AND Page = '{0}'            ";
 
-list_api = api.get_cs_players()
-
-for i in list_api:
-    print(list_api[i])
+print(query)

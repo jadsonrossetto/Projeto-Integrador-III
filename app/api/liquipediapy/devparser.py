@@ -13,6 +13,7 @@ class DevParser():
 
 	def __init__(self, config_folder: str):
 		self.__folder_path = config_folder
+  
 		self._k = len(self.__folder_path)
 		print("********" + "*" * self._k)
 		print('*       RUNNING DEBUG MODE')

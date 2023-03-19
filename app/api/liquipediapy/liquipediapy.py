@@ -4,10 +4,11 @@ import requests
 from urllib.request import quote
 
 # For debug purposes
-from api.liquipediapy.devparser import DevParser
+#from api.liquipediapy.devparser import DevParser
+from api.liquipediapy.database_parser import DatabaseParser
 
 class liquipediapy():
-	def __init__(self, appname: str, game: str, debug_folder: str= ""):
+	def __init__(self, appname:str, game:str , debug_database:str=None):
 		self.appname = appname
 		self.game = game
 		self.__headers = {'User-Agent': appname, 'Accept-Encoding': 'gzip'}
@@ -18,15 +19,21 @@ class liquipediapy():
 		# and reading from it afterwards to avoid surcharing liquipedia api
 		# If read mode and file requested not in folder, query will happen
 		self.__debug = False
-		if debug_folder != "":
-			self.devparser = DevParser(debug_folder) 
+		if debug_database != None:
+			#self.devparser = DevParser(debug_folder)
+			self.devparser = DatabaseParser()
 			self.__debug = True
 
 	def parse(self,page):
 		success, soup = False, None
 
 		# If page.html is readable from file
-		if self.__debug and self.devparser.isPageAvailableLocally(page):
+		#if self.__debug and self.devparser.isPageAvailableLocally(page):
+		if self.__debug and self.devparser.isDatabasePageAvailable(quest = 
+                                                             {	'appname': self.appname,
+                                                            	'game': self.game,
+                                                                'base_url': self.__base_url
+                                                            }):
 			success, soup = self.devparser.fromFile(page)
 		else:
 			url = self.__base_url+'action=parse&format=json&page='+page
