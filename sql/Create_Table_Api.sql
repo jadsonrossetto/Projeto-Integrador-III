@@ -1,11 +1,11 @@
 
-CREATE TABLE `API_LOG` (
-	`IdApi` mediumint(100) unsigned NOT NULL,
-    `Url` varchar(100) default NULL,
-    `Page` varchar(80) default NULL,
-    `Headers` varchar(80) default null,
-    `BaseUrl` varchar(10) default null,
-    `ApiJson` JSON default null,
-    `Game` varchar(80) default null,
-    PRIMARY KEY (`IdApi`)
-)AUTO_INCREMENT=1;
+CREATE TABLE `LOGRESTAPI` (
+		`IdApi` int(5) NOT NULL AUTO_INCREMENT,
+		`Url` varchar(500) default NULL,
+		`Page_` varchar(500) default NULL,
+		`Headers` varchar(500) default null,
+		`BaseUrl` varchar(500) default null,
+		`Html` longtext default null,
+		`Game` varchar(200) default null,
+        PRIMARY KEY(`IdApi`)
+	);

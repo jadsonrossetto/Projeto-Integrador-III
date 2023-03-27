@@ -1,89 +1,90 @@
-import api.liquipediapy.exceptions as ex
-from bs4 import BeautifulSoup
+###########################################################################
+# Author: Daniel Marinho Ferreira de Souza
+# modification: 26/03/2023 
+#
+# Essa classe utilizada para realizar pesquisa no Banco MySql sobre dados fornecido 
+# se não tive, realizar busca pela APi da liquipidia e gravar os dados de retorno no banco
+# 
+# Documentação base: 
+#                  1° 
+#                  2° 
+#                  3° https://dev.mysql.com/doc/connector-python/en/connector-python-example-cursor-transaction.html
+###########################################################################
+
 import requests
-from urllib.request import quote
-
-# For debug purposes
-#from api.liquipediapy.devparser import DevParser
+import api.liquipediapy.exceptions as ex
+from connection.connertion_database import MySqlQuary
 from api.liquipediapy.database_parser import DatabaseParser
-
-class liquipediapy():
-	def __init__(self, appname:str, game:str , debug_database:str=None):
-		self.appname = appname
-		self.game = game
-		self.__headers = {'User-Agent': appname, 'Accept-Encoding': 'gzip'}
-		self.__base_url = 'https://liquipedia.net/'+game+'/api.php?'
-
-		# If enabled, offer the possibility to
-		# write the output of parse.page_html to a folder
-		# and reading from it afterwards to avoid surcharing liquipedia api
-		# If read mode and file requested not in folder, query will happen
-		self.__debug = False
-		if debug_database != None:
-			#self.devparser = DevParser(debug_folder)
-			self.devparser = DatabaseParser()
-			self.__debug = True
-
-	def parse(self,page):
-		success, soup = False, None
-
-		# If page.html is readable from file
-		#if self.__debug and self.devparser.isPageAvailableLocally(page):
-		if self.__debug and self.devparser.isDatabasePageAvailable(quest = 
-                                                             {	'appname': self.appname,
-                                                            	'game': self.game,
-                                                                'base_url': self.__base_url
-                                                            }):
-			success, soup = self.devparser.fromFile(page)
-		else:
-			url = self.__base_url+'action=parse&format=json&page='+page
-			response = requests.get(url, headers=self.__headers)
-			if response.status_code == 200:
-				try:
-					page_html = response.json()['parse']['text']['*']
-				except KeyError:
-					raise ex.RequestsException(response.json(),response.status_code)	
-			else:
-				raise ex.RequestsException(response.json(),response.status_code)
-
-			soup = BeautifulSoup(page_html,features="lxml")
-
-		# If page.html wasn't readable from file, write it for next time
-		if (self.__debug and not self.devparser.isPageAvailableLocally(page)):
-			self.devparser.toFile(soup, page)
-
-		redirect = soup.find('ul',class_="redirectText")
-		if redirect is None:
-			return soup,None
-		else:
-			redirect_value = soup.find('a').get_text()
-			redirect_value = quote(redirect_value)
-			soup,__ = self.parse(redirect_value)
-			return soup,redirect_value
+from bs4 import BeautifulSoup
+from urllib.request import quote
+import json as _json
 
 
+class liquipediapy:
 
-	def dota2webapi(self,matchId):
-		if self.game == 'dota2':
-			url = self.__base_url+'action=dota2webapi&data=picks_bans|players|kills_deaths|duration|radiant_win|teams|start_time&format=json&matchid='+matchId
-			response = requests.get(url, headers=self.__headers)
-			if response.status_code == 200:
-				res = response.json()
-				if res['dota2webapi']['isresult'] >= 1:
-					return res['dota2webapi']['result']
-				else:
-					return res['dota2webapi']['result']['error']
-			else:
-				raise ex.RequestsException(response.json(),response.status_code)
-		else:
-			raise ex.RequestsException('set game as dota2 to access this api',0)			
-
-
-
-	def search(self,serachValue):
-		url = self.__base_url+'action=opensearch&format=json&search='+serachValue
-		response = requests.get(url, headers=self.__headers)
-		if response.status_code == 200:
-			return  response.json()
-		else:
-			raise ex.RequestsException(response.json(),response.status_code)		
+    
+    def __init__(self, appname=str, game=str , base_dados:str='', debug_database:bool=False) -> None:
+        '''
+        Construtor da class
+        '''
+        self.appname=appname
+        self.game=game
+        self.__headers={'User-Agent': appname, 'Accept-Encoding': 'gzip'}
+        self.__base_url='https://liquipedia.net/'+game+'/api.php?'
+        self.__base_dados=base_dados
+        self.__debug=False
+        self.dabug_database=debug_database #passar valor True para verficar se existe essa pagina na tebale
+        self.devparser:DatabaseParser
+        self.__debug:bool
+        
+    def check_dabug_database(self):
+        #Metodo de verificação se vai utilizar base de dados para armazenar pagina pesquisada
+        #Se não somente faz a pesquisa
+        if self.dabug_database == False:
+            return 
+        else:
+            self.devparser = DatabaseParser(self.dabug_database, self.__base_dados)
+            self.__debug = True
+        return
+    
+    def parse(self,page):
+        # Metodo que realizar pesquisar da pagina 
+        # executando primeiramente o "Metodo: check_dabug_database "
+        self.check_dabug_database();
+        success=False
+        select ="""SELECT Html FROM LOGRESTAPI """
+        data = f"WHERE Page_='{page}' AND BaseUrl='{self.__base_url}' AND Game='{self.game}' " 
+        query = select + data 
+                    
+        
+        if self.__debug and self.devparser.isDatabasePageAvailable(query): #Melhorar generalidade
+            print('Já existe aquivos pagina do banco')
+            success = True
+           # success, page_html = self.devparser.from_database()
+        else:
+            url = self.__base_url+'action=parse&format=json&page='+page
+            response = requests.request('Get', url, headers=self.__headers, timeout=120)
+            
+            if response.status_code == 200:
+                try:
+                    page_html = response.json()['parse']['text']['*']
+                    # Tratamento page_html
+                    page_html = page_html.replace(' ', '')
+                    page_html = page_html.replace('/', f'\\')
+                    page_html = page_html.replace('"', "'")
+                except KeyError:
+                    raise ex.RequestsException(response.json(),response.status_code)
+            else:
+                raise ex.RequestsException(response.json(),response.status_code)
+        
+            if success == False:
+                # Tratamento headers
+                headers =  _json.dumps(self.__headers)
+                headers = headers.replace('"',"")
+                
+                insert = """INSERT INTO LOGRESTAPI (IdApi, Url, Page_, Headers, BaseURL, Html, Game) VALUES (%s, %s, %s, %s, %s, %s, %s) """ 
+                data = (None, url , page, headers, self.__base_url, page_html, self.game)
+                
+                db = MySqlQuary()
+                sucess = db.run_query(insert, data)
+                return sucess

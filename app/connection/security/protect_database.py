@@ -5,13 +5,15 @@ import os
 
 class Protect:
         
-    def __init__(self) -> None:
-        self.config_ = ''
+    def __init__(self, conect:bool):
+        self.__connect = conect
            
     def key_database(self, key=str):
-        self.config_ = os.path.expanduser('~/app/connection/security/db.env')
+        self.config_ = os.path.expanduser('~Daniel\\OneDrive\\Faculdade\\Projeto Integrador III\\app\\connection\\security\\db.env')
         info = dotenv_values(self.config_, encoding="utf-8")  
-        if info != None:
+        
+        
+        if info != None and self.__connect:
             return info[key]
         else :
             return 
@@ -23,7 +25,7 @@ class Protect:
         if self.config_ != '':
             return self.config_
         
-    def query_sql(self, file_query):
+    def query_sql(self, file_query) ->str:
         '''
         Função que busca a query no arquivo informado.
         @self.config_ : local aonda se enconrar os aquivos slq

@@ -13,13 +13,13 @@
 
 from connection.security.protect_database  import Protect
 from mysql.connector import errorcode
-import mysql.connector
+import mysql.connector 
 
 
 
 class MySqlQuary : #Class que realizar conexão com bando Mysql
     
-    def __init__(self, use_pure:bool=False, host=str, port=str, database=str, user=str, password=str) -> None:
+    def __init__(self, use_pure:bool=False,) -> None:
         '''
         Construtor da class
         
@@ -32,20 +32,16 @@ class MySqlQuary : #Class que realizar conexão com bando Mysql
         @password : variavel recebe senha do banco
         '''
         self.use_pure = use_pure
-        self.host = host
-        self.port = port
-        self.database = database
-        self.user = user
-        self.password = password
+        self.host =     Protect(True).key_database('HOST')
+        self.port =     Protect(True).key_database('PORT')
+        self.database = Protect(True).key_database('DATABASE')
+        self.user =     Protect(True).key_database('USER')
+        self.password = Protect(True).key_database('PASSWORD')
         
-        
-        def __del__(self) -> None:
-            if self.cursor:
-                self.close() 
-            
-    def connect(self) -> None:
+    
+    def connect(self) -> bool:
         '''
-        Esse método realiza a conexão com o banco de dados MySql
+        Esse método realiza a conexão com o banco de dados MySql retorna se teve sucesso.
             
         Parameters:
         @user : variavel do construtor com informação do usuario
@@ -57,28 +53,52 @@ class MySqlQuary : #Class que realizar conexão com bando Mysql
         são retornadas como literais Python Unicode.Como prevenção está informado como verdadeiro
         '''
         try:
-            self.connection = mysql.connector.connect( host=Protect.key_database('HOST'), 
-                                                       user=Protect.key_database('USER'),
-                                                       password=Protect.key_database('PASSWORD'),                                      
-                                                       database=Protect.key_database('DATABASE'))
-            return self.connection
-        
+            self.connection = mysql.connector.connect( host=self.host,               #Protect(True).key_database('HOST'), 
+                                                       database=self.database,       #Protect(True).key_database('DATABASE'))
+                                                       user=self.user,              #Protect(True).key_database('USER'),
+                                                       password=self.password      #Protect(True).key_database('PASSWORD'),                                      
+                                                    )
+            if self.connection != None:
+                return True 
+            
         except mysql.connector.Error as error:
             
             if error.errno == errorcode.ER_BAD_DB_ERROR:
                 print("Database não existe")
-            
+                
             if error.errno == errorcode.ER_ACCESS_DENIED_ERROR:
                 print("Usuáro ou  senha  está errado")
                 print(error)       
-        return 
+        return False
+    
         
-    def sqltoQuery(self, query=str):
-      
-        if self.connect() != None:
-            self.cursor = self.connection.cursor()
-            self.cursor.execute(query)
-            print(self.cursor.fetchone())
+    def run_query(self, query:str, data:tuple=''):
+        '''
+        Função realizar Insert e select no banco
+        
+        @para inserir informar os dois metodo
+           >>> run_query(query, data)
             
-        else:
-            print("Erro conexão com banco")
+        @para realizar select informar somente o metodo query
+          >>> run_query(query)
+        '''
+        
+        
+        try:
+            if self.connect() != False:
+                cursor = self.connection.cursor()
+                if data != '':
+                    cursor.execute(query, data)
+                    result = cursor.fetchall()
+                    self.connection.commit()
+                else: 
+                    cursor.execute(query)
+                    result = cursor.fetchmany()
+                    self.connection.commit()
+                    
+                return result 
+        except mysql.connector.Error as error:
+            return "Erro: {}".format(error.msg)
+        finally:
+            if self.connection.is_connected:
+                self.connection.close()

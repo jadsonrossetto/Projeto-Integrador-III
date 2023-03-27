@@ -1,41 +1,53 @@
-from connection.connertion_database import MySqlQuary
+###########################################################################
+# Author: Daniel Marinho Ferreira de Souza
+# modification: 26/03/2023 
+#
+# 
+# 
+# 
+# Documentação base: 
+#                  1° 
+#                  2° 
+#                  3° 
+###########################################################################
 
+
+from connection.connertion_database import MySqlQuary
+from bs4 import BeautifulSoup
 
 class DatabaseParser:
     
     
-    def __init__(self,  config_folder: str) -> None:
-        self.__folder_path = config_folder
-        self.appname = None
-        self.game = None
-        self.base_url = None
+    def __init__(self, debug:bool, base_dados:str) -> None:
+        self.debug = debug
+        self.base_dados = base_dados
         
-    def isDatabasePageAvailable(self, endpoint:dict) -> bool:
+      
+    def isDatabasePageAvailable(self, query:str) -> bool:
         '''
         Função tem o proposito de verificar se existe no banco de dados o page salva no log api.
         '''
-        for i in endpoint:
-            self.appname = i['appnome'],
-            self.game = i['base_url'],
-            self.base_url = i['base_url']
-              
-        query = f"SELECT ApiJson FROM TESTE.API_LOG "
-        match query != '':
-            case self.actual(self.appname): 
-                query = query+f"WHERE PAGE='{self.appname}' "
-            case self.actual(self.game):
-                query = query+f"AND Gema='{self.game}'"
-            case self.actual(self.base_url):
-                query = query+f"AND BaseUrl='{self.base_url}'"    
-        connect = MySqlQuary().sqltoQuery(query)
-        return  connect     
-                
+        if query != None:
+            
+            db = MySqlQuary(True)
+            sucess = db.run_query(query)
+            
+            if len(sucess) == 0:
+                return False
+            else:
+                return True
         
+        
+        
+    
+    def from_database(self, tupla):
+      success=False 
+      soup=BeautifulSoup
+      return success, soup
+      
     def actual(self, val):
    
-        if val != None:
+        if val != None and val != '':
             return True
-        elif val == '':
-            return False
-        else: False
-        
+        else:
+            return False    
