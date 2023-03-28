@@ -3,3 +3,6 @@ documentation
 env
 app/connection/security/db.env
 *.env
+.vscode/launch.json
+.gitignore
+.vscode/settings.json

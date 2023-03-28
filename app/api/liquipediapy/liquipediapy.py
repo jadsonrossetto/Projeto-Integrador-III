@@ -77,7 +77,7 @@ class liquipediapy:
             else:
                 raise ex.RequestsException(response.json(),response.status_code)
         
-            if success == False:
+            if success == False and not self.__debug:
                 # Tratamento headers
                 headers =  _json.dumps(self.__headers)
                 headers = headers.replace('"',"")
