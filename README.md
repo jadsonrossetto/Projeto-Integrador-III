@@ -1,7 +1,7 @@
 # Projeto-Integrador-III 
 
-Espesificações :
-  Esse projeto tem o intuito de realizar estrações de dados e analises do site liquipida utilizando a sua API e futuramente outros sites. 
+Especificações :
+  Esse projeto tem o intuito de realizar estrações de dados e analises do site liquipedia utilizando a sua API e futuramente outros sites. 
 
 ## Requisitos necessarios para rodar o projeto 
  
@@ -22,17 +22,17 @@ Espesificações :
     ``` env\Scripts\activate.bat ```
   
   Para mais informações
-  - documentation https://docs.python.org/3/library/venv.html
+  - Documentation https://docs.python.org/3/library/venv.html
     
 <a name="requirements"></a>
 ## Instalação Arquivo requirements.txt
   
  ``` pip install -r requirements.txt ```
- Pra mais informações 
+ Para mais informações 
  - Documentation https://pypi.org/project/requests/
 
 <a name="MySql"></a>
-## Instalação  MySql na sua maquina
+## Instalação MySql na sua maquina
 
 
 Pra mais informações 
